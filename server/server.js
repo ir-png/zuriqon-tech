@@ -1,4 +1,18 @@
 const Express = require("express");
+const mysql = require('mysql2/promise');
+// Load DB config from environment variables (provide defaults for local dev)
+const dbConfig = {
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'zuriqon_db',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+};
+// Create a connection pool that can be reused across requests
+const pool = mysql.createPool(dbConfig);
+
 const App = Express();
 const Port = process.env.PORT || 3000;
 
@@ -26,7 +40,26 @@ App.post('/api/post', (req, res) => {
   });
 });
 
-// Inquiries endpoint for backup / server-side logging
+// Quote request endpoint – stores inquiry in MySQL
+App.post('/api/quote', async (req, res) => {
+  const { fullName, email, phone, service, message } = req.body;
+  if (!fullName || !email || !service || !message) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+  try {
+    const [result] = await pool.execute(
+      `INSERT INTO project_inquiries (full_name, email, phone, target_service, project_description)
+       VALUES (?, ?, ?, ?, ?)`,
+      [fullName, email, phone || null, service, message]
+    );
+    console.log(`[DB] Inquiry ID ${result.insertId} saved.`);
+    return res.status(201).json({ status: 'success', inquiryId: result.insertId });
+  } catch (err) {
+    console.error('DB insertion error:', err);
+    return res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 App.post('/api/inquiries', (req, res) => {
   const { fullName, email, phone, service, message } = req.body;
   if (!fullName || !email || !service || !message) {

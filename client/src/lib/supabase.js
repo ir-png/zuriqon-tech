@@ -41,13 +41,25 @@ export async function submitInquiry(inquiryData) {
     return { success: true, mode: 'supabase', data };
   }
 
-  // Graceful simulated delivery when Supabase environment variables are pending
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  console.info('Inquiry recorded locally (Supabase keys pending):', inquiryData);
-  return {
-    success: true,
-    mode: 'simulation',
-    message: 'Inquiry received. Once VITE_SUPABASE_URL is connected, inquiries are automatically written to your Supabase PostgreSQL inquiries table.'
-  };
+  // Fallback: send to our Express API that stores in MySQL
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+  if (!backendUrl) {
+    console.warn('No backend URL configured; inquiry will be logged locally.');
+    console.info('Inquiry payload:', inquiryData);
+    return { success: true, mode: 'log-only', message: 'No backend URL configured.' };
+  }
+  const response = await fetch(`${backendUrl}/api/quote`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(inquiryData),
+  });
+  if (!response.ok) {
+    const err = await response.json();
+    console.error('Backend error inserting inquiry:', err);
+    throw new Error(err.error || 'Backend request failed');
+  }
+  const result = await response.json();
+  return { success: true, mode: 'mysql', data: result };
 }
+
 
