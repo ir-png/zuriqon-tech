@@ -1,4 +1,5 @@
 const Express = require("express");
+import { createSupabaseContext } from '@supabase/server/core'
 const mysql = require('mysql2/promise');
 // Load DB config from environment variables (provide defaults for local dev)
 const dbConfig = {
