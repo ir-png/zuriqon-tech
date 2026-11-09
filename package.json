@@ -1,0 +1,20 @@
+{
+  "name": "zuriqon-technology-group",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zuriqon Technology Group (ZTG) Corporate Homepage & Platform",
+  "scripts": {
+    "dev": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "preview": "npm --prefix client run preview",
+    "server": "node server/server.js"
+  },
+  "keywords": [
+    "zuriqon",
+    "ztg",
+    "technology",
+    "software-development",
+    "digital-transformation"
+  ]
+}
+
