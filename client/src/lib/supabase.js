@@ -42,7 +42,7 @@ export async function submitInquiry(inquiryData) {
   }
 
   // Fallback: send to our Express API that stores in MySQL
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+  const backendUrl = import.meta.env.VITE_API_URL || '';
   if (!backendUrl) {
     console.warn('No backend URL configured; inquiry will be logged locally.');
     console.info('Inquiry payload:', inquiryData);

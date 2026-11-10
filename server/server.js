@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const Express = require('express');
 const cors = require('cors');
 // const { createSupabaseContext } = require('@supabase/server/core');
