@@ -1,8 +1,8 @@
-const express = require('express');
+const Express = require('express');
 const cors = require('cors');
-const { createSupabaseContext } = require('@supabase/server/core');
+// const { createSupabaseContext } = require('@supabase/server/core');
 
-const app = express();
+
 const mysql = require('mysql2/promise');
 // Load DB config from environment variables (provide defaults for local dev)
 const dbConfig = {
